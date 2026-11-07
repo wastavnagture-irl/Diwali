@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiwaliGlow — शुभ दीपावली</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Sans+Devanagari:wght@400;600;700&family=Poppins:wght@400;500;600&family=Rozha+One&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-deep: #120524;
+      --bg-purple: #240b42;
+      --bg-crimson: #5c0a1b;
+      --gold-bright: #ffd86b;
+      --gold-rich: #d49b27;
+      --cream-card: #fff6dc;
+      --crimson-accent: #b81d24;
+      --whatsapp-green: #1fa855;
+      --text-light: #fdf6e4;
+      --text-dark: #3b1114;
+      --font-hindi-display: 'Rozha One', 'Noto Sans Devanagari', serif;
+      --font-hindi-body: 'Noto Sans Devanagari', sans-serif;
+      --font-script: 'Great Vibes', cursive;
+      --font-ui: 'Poppins', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 35%, var(--bg-crimson) 0%, var(--bg-purple) 55%, var(--bg-deep) 100%);
+      color: var(--text-light);
+      font-family: var(--font-ui), var(--font-hindi-body);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: background 0.8s ease;
+    }
+
+    body[data-stage="diya-lit"] {
+      background: radial-gradient(circle at 50% 45%, #a8581b 0%, #4d2208 55%, #1c0903 100%);
+    }
+
+    body[data-stage="rocket"],
+    body[data-stage="envelope"] {
+      background: radial-gradient(circle at 50% 35%, #2b0c3d 0%, #140521 65%, #090212 100%);
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Stage 0: Marigold Bead Curtain */
+    .curtain-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      pointer-events: auto;
+    }
+
+    .curtain-overlay.open {
+      pointer-events: none;
+    }
+
+    .curtain-panel {
+      width: 50%;
+      height: 100%;
+      background-color: #3b070b;
+      background-image: radial-gradient(circle at 50% 50%, #ffae19 5px, #d94e0f 7px, transparent 8px);
+      background-size: 20px 22px;
+      border-bottom: 4px solid var(--gold-bright);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      transition: transform 1.2s cubic-bezier(0.7, 0, 0.2, 1);
+    }
+
+    .curtain-overlay.open .curtain-panel.left {
+      transform: translateX(-102%);
+    }
+
+    .curtain-overlay.open .curtain-panel.right {
+      transform: translateX(102%);
+    }
+
+    /* Top Bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 15;
+    }
+
+    .brand-title {
+      font-family: var(--font-script);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      color: var(--gold-bright);
+      text-shadow: 0 2px 10px rgba(255, 216, 107, 0.45);
+    }
+
+    .icon-btn {
+      background: rgba(18, 5, 36, 0.75);
+      color: var(--gold-bright);
+      border: 1px solid rgba(255, 216, 107, 0.5);
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 40px;
+    }
+
+    /* Side Fairy Lights */
+    .fairy-border {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 12px;
+      z-index: 5;
+      background-image: radial-gradient(circle, var(--gold-bright) 3px, transparent 4px);
+      background-size: 12px 24px;
+      opacity: 0.75;
+    }
+    .fairy-border.left { left: 6px; }
+    .fairy-border.right { right: 6px; }
+
+    /* Stage Container */
+    .stage-container {
+      position: relative;
+      z-index: 6;
+      width: 100%;
+      max-width: 460px;
+      padding: 4.5rem 1.25rem 2rem;
+      text-align: center;
+    }
+
+    .stage-panel {
+      animation: stageFadeIn 0.45s ease forwards;
+    }
+
+    @keyframes stageFadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .eyebrow-subtitle {
+      font-size: 0.9rem;
+      color: rgba(253, 246, 228, 0.88);
+      margin-bottom: 0.5rem;
+    }
+
+    .hindi-title {
+      font-family: var(--font-hindi-display);
+      font-size: clamp(2.4rem, 7vw, 3.4rem);
+      font-weight: 400;
+      color: var(--gold-bright);
+      text-shadow: 0 3px 16px rgba(212, 155, 39, 0.65);
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+
+    /* Central Card Frame */
+    .hero-card-frame {
+      position: relative;
+      background: linear-gradient(160deg, var(--cream-card) 0%, #ffe6a3 100%);
+      color: var(--text-dark);
+      border: 2px solid var(--gold-rich);
+      border-radius: 20px;
+      padding: 1.85rem 1.4rem;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 24px rgba(255, 216, 107, 0.25);
+    }
+
+    .corner-ornament {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--crimson-accent);
+      pointer-events: none;
+    }
+    .corner-ornament.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .corner-ornament.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .corner-ornament.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .corner-ornament.br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    .festive-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #fff8e7, #ffd86b);
+      border: 2px dashed var(--crimson-accent);
+      border-radius: 14px;
+      padding: 0.85rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge-text {
+      font-family: var(--font-hindi-display);
+      font-size: clamp(1.8rem, 5.5vw, 2.3rem);
+      color: var(--crimson-accent);
+      display: block;
+    }
+
+    .card-caption {
+      font-family: var(--font-hindi-body);
+      font-size: 1rem;
+      font-weight: 600;
+      color: #5c181b;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Stage 2: Temple Arch & Diya */
+    .temple-arch {
+      position: relative;
+      width: 240px;
+      height: 310px;
+      margin: 0 auto 1.25rem;
+      background: linear-gradient(180deg, #f3bd52 0%, #c98219 100%);
+      border: 4px solid #ffe49e;
+      border-radius: 120px 120px 18px 18px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), inset 0 0 24px rgba(120, 45, 5, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 1rem 1.2rem;
+      overflow: hidden;
+    }
+
+    .arch-mandala {
+      font-size: 1.8rem;
+      color: var(--crimson-accent);
+      z-index: 2;
+    }
+
+    .diya-aura {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      bottom: 35px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 230, 128, 0.85) 0%, rgba(255, 153, 0, 0.35) 50%, transparent 72%);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+    }
+
+    .temple-arch.lit .diya-aura {
+      opacity: 1;
+      transform: scale(1.25);
+    }
+
+    .diya-interactive {
+      position: relative;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 3;
+      padding: 1rem 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .diya-svg {
+      width: 115px;
+      height: 58px;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+    }
+
+    .diya-flame {
+      width: 24px;
+      height: 40px;
+      background: radial-gradient(ellipse at 50% 75%, #ffffff 15%, #ffd000 55%, #ff5100 92%);
+      border-radius: 50% 50% 35% 35% / 65% 65% 35% 35%;
+      box-shadow: 0 0 22px #ffae00, 0 0 42px #ff5100;
+      margin-bottom: -10px;
+      opacity: 0;
+      transform: scale(0.2);
+      transform-origin: bottom center;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .temple-arch.lit .diya-flame {
+      opacity: 1;
+      transform: scale(1);
+      animation: flameFlicker 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes flameFlicker {
+      0% { transform: scale(0.96, 1.03) rotate(-2deg); }
+      100% { transform: scale(1.04, 0.97) rotate(2deg); }
+    }
+
+    .arch-lamps {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 0.5rem;
+    }
+
+    .mini-lamp {
+      width: 14px;
+      height: 9px;
+      background: #8a2515;
+      border-radius: 0 0 10px 10px;
+      border: 1px solid var(--gold-bright);
+    }
+
+    /* Stage 3: Bottle Rocket */
+    .rocket-stage-box {
+      height: 290px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 1.5rem;
+    }
+
+    .rocket-interactive {
+      position: relative;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      transition: transform 0.2s ease;
+    }
+
+    .rocket-interactive.launching {
+      animation: rocketLaunch 1.05s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes rocketLaunch {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      20% { transform: translateY(6px) scale(0.98); }
+      100% { transform: translateY(-420px) scale(0.6); opacity: 0; }
+    }
+
+    .rocket-cone {
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 32px solid #e62e2d;
+    }
+
+    .rocket-body {
+      width: 30px;
+      height: 64px;
+      background: repeating-linear-gradient(
+        -35deg,
+        #d62828,
+        #d62828 8px,
+        #ffd86b 8px,
+        #ffd86b 14px
+      );
+      border: 2px solid var(--gold-bright);
+      border-radius: 3px;
+    }
+
+    .rocket-stick {
+      width: 4px;
+      height: 75px;
+      background: #e0b77d;
+    }
+
+    .rocket-fuse-spark {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffea79;
+      box-shadow: 0 0 18px #ff9100, 0 0 30px #ff3300;
+      margin-top: -62px;
+      opacity: 0;
+    }
+
+    .rocket-interactive.launching .rocket-fuse-spark {
+      opacity: 1;
+    }
+
+    .stage-prompt {
+      font-size: 1.05rem;
+      color: var(--gold-bright);
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .stage-subhint {
+      font-size: 0.8rem;
+      color: rgba(253, 246, 228, 0.7);
+    }
+
+    .hidden-action {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .hidden-action.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Stage 4: Envelope & Secret Letter */
+    .mandala-emblem {
+      font-size: 2rem;
+      color: var(--crimson-accent);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .sender-tag {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #7a3e10;
+      background: rgba(255, 216, 107, 0.4);
+      border: 1px dashed var(--gold-rich);
+      border-radius: 999px;
+      padding: 0.2rem 0.8rem;
+      display: inline-block;
+      margin-bottom: 0.4rem;
+    }
+
+    .recipient-heading {
+      font-family: var(--font-script), var(--font-hindi-display);
+      font-size: clamp(1.8rem, 5vw, 2.3rem);
+      color: var(--crimson-accent);
+      margin-bottom: 1rem;
+      font-weight: 400;
+      word-break: break-word;
+    }
+
+    .envelope-wrapper {
+      min-height: 165px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .envelope-box {
+      position: relative;
+      width: 220px;
+      height: 135px;
+      background: linear-gradient(145deg, #c91e25, #8f1117);
+      border: 2px solid var(--gold-bright);
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(143, 17, 23, 0.4);
+      overflow: hidden;
+      transition: transform 0.25s ease;
+    }
+
+    .envelope-box:hover {
+      transform: translateY(-3px);
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-left: 108px solid transparent;
+      border-right: 108px solid transparent;
+      border-top: 68px solid #a11319;
+      transform-origin: top center;
+      transition: transform 0.45s ease;
+    }
+
+    .envelope-box.opening .envelope-flap {
+      transform: rotateX(180deg);
+    }
+
+    .envelope-seal {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffe382, #d49b27);
+      border: 2px solid #fff6dc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .secret-letter {
+      width: 100%;
+      background: #fffdf7;
+      border: 1.5px solid var(--gold-rich);
+      border-radius: 14px;
+      padding: 1.1rem 1rem;
+      color: var(--text-dark);
+      box-shadow: inset 0 0 12px rgba(212, 155, 39, 0.2);
+      animation: letterReveal 0.45s ease forwards;
+      text-align: center;
+    }
+
+    @keyframes letterReveal {
+      from { opacity: 0; transform: translateY(10px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .letter-salutation {
+      font-weight: 600;
+      color: var(--crimson-accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .letter-body {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 0.6rem;
+      word-break: break-word;
+    }
+
+    .letter-signoff {
+      font-weight: 600;
+      color: var(--crimson-accent);
+      font-size: 0.9rem;
+    }
+
+    .envelope-hint {
+      font-size: 0.82rem;
+      color: #6e2226;
+      margin-bottom: 0.9rem;
+    }
+
+    /* Share & Utility Button Rows */
+    .share-action-row {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+
+    .card-action-row {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .whatsapp-btn {
+      background: linear-gradient(135deg, #25d366, var(--whatsapp-green));
+      color: #ffffff;
+      border: 1.5px solid #ffffff;
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 42px;
+      box-shadow: 0 5px 14px rgba(31, 168, 85, 0.35);
+      transition: transform 0.2s ease;
+    }
+
+    .whatsapp-btn:hover,
+    .whatsapp-btn:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--crimson-accent), #8c1117);
+      color: var(--gold-bright);
+      border: 1.5px solid var(--gold-bright);
+      border-radius: 999px;
+      padding: 0.7rem 1.65rem;
+      font-family: var(--font-ui), var(--font-hindi-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      box-shadow: 0 6px 18px rgba(184, 29, 36, 0.45);
+      transition: transform 0.2s ease;
+    }
+
+    .primary-btn.compact-btn {
+      padding: 0.6rem 1.15rem;
+      font-size: 0.88rem;
+      min-height: 42px;
+    }
+
+    .secondary-btn {
+      background: rgba(184, 29, 36, 0.1);
+      color: var(--crimson-accent);
+      border: 1.5px solid var(--crimson-accent);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+    }
+
+    .share-toast {
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #155724;
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+    }
+
+    /* Modal Popup Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 2, 18, 0.82);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: stageFadeIn 0.3s ease forwards;
+    }
+
+    .modal-overlay[hidden] {
+      display: none !important;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      background: linear-gradient(160deg, var(--cream-card) 0%, #ffe6a3 100%);
+      color: var(--text-dark);
+      border: 2px solid var(--gold-rich);
+      border-radius: 20px;
+      padding: 1.8rem 1.35rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      text-align: center;
+    }
+
+    .modal-title {
+      font-family: var(--font-hindi-display);
+      font-size: 1.8rem;
+      color: var(--crimson-accent);
+      font-weight: 400;
+      margin-bottom: 0.25rem;
+    }
+
+    .modal-desc {
+      font-size: 0.86rem;
+      color: #6e2226;
+      margin-bottom: 1.15rem;
+      font-weight: 500;
+    }
+
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: left;
+    }
+
+    .festive-input {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border-radius: 12px;
+      border: 1.5px solid #d49b27;
+      background: #fffdf7;
+      color: var(--text-dark);
+      font-family: var(--font-ui), var(--font-hindi-body);
+      font-size: 0.92rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .festive-input:focus {
+      outline: none;
+      border-color: var(--crimson-accent);
+      box-shadow: 0 0 0 3px rgba(184, 29, 36, 0.18);
+    }
+
+    .modal-btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.35rem;
+    }
+
+    .full-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .text-close-btn {
+      background: transparent;
+      border: none;
+      color: #6e2226;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.4rem;
+      margin-top: 0.2rem;
+      text-align: center;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body data-stage="hero">
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+  <div id="curtain-overlay" class="curtain-overlay" aria-hidden="true">
+    <div class="curtain-panel left"></div>
+    <div class="curtain-panel right"></div>
+  </div>
+
+  <header class="top-bar">
+    <div class="brand-title">Happy Diwali ✨</div>
+    <button id="audio-toggle" class="icon-btn" type="button" aria-pressed="false" aria-label="Toggle festive sound">
+      🔇 <span class="btn-label">Sound Off</span>
+    </button>
+  </header>
+
+  <div class="fairy-border left" aria-hidden="true"></div>
+  <div class="fairy-border right" aria-hidden="true"></div>
+
+  <main class="stage-container" id="app-stage">
+    <section class="stage-panel active" id="stage-hero" aria-labelledby="hindi-headline">
+      <p class="eyebrow-subtitle">Some wishes deserve more than just a WhatsApp message</p>
+      <h1 id="hindi-headline" class="hindi-title">शुभ दीपावली</h1>
+
+      <div class="hero-card-frame">
+        <div class="corner-ornament tl" aria-hidden="true"></div>
+        <div class="corner-ornament tr" aria-hidden="true"></div>
+        <div class="corner-ornament bl" aria-hidden="true"></div>
+        <div class="corner-ornament br" aria-hidden="true"></div>
+
+        <div class="festive-badge">
+          <span class="badge-text">जगमग दिवाली</span>
+        </div>
+
+        <p class="card-caption" id="preview-caption">रोशनी का त्योहार आ गया</p>
+
+        <div class="card-actions">
+          <button id="to-diya-btn" class="primary-btn" type="button">
+            रोशनी फैलाएं ✨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage-panel" id="stage-diya" aria-label="Light the Diwali Diya" hidden>
+      <div class="temple-arch" id="temple-arch">
+        <div class="arch-mandala" aria-hidden="true">✿</div>
+        <div class="diya-aura" id="diya-aura" aria-hidden="true"></div>
+
+        <button id="diya-btn" class="diya-interactive" type="button" aria-label="Tap the diya to light it">
+          <span class="diya-flame" id="diya-flame" aria-hidden="true">
+            <span class="flame-inner"></span>
+          </span>
+          <svg class="diya-svg" viewBox="0 0 140 70" role="img" aria-hidden="true">
+            <path d="M15,25 Q70,42 125,25 Q115,65 70,65 Q25,65 15,25 Z" fill="#9e331e" stroke="#ffd86b" stroke-width="3"/>
+            <path d="M26,35 Q70,48 114,35" fill="none" stroke="#ffd86b" stroke-width="2" stroke-dasharray="4 3"/>
+          </svg>
+        </button>
+
+        <div class="arch-lamps" aria-hidden="true">
+          <span class="mini-lamp"></span>
+          <span class="mini-lamp"></span>
+        </div>
+      </div>
+
+      <p class="stage-prompt" id="diya-prompt">Tap the diya to light it</p>
+      <button id="to-rocket-btn" class="primary-btn hidden-action" type="button">
+        उजाला आगे बढ़ाएं →
+      </button>
+    </section>
+
+    <section class="stage-panel" id="stage-rocket" aria-label="Launch the Diwali Rocket" hidden>
+      <p class="stage-prompt" id="rocket-prompt">Double tap to light it</p>
+
+      <div class="rocket-stage-box">
+        <button id="rocket-btn" class="rocket-interactive" type="button" aria-label="Double tap or press Enter to launch rocket">
+          <div class="rocket-cone"></div>
+          <div class="rocket-body"></div>
+          <div class="rocket-stick"></div>
+          <div class="rocket-fuse-spark" id="rocket-spark" aria-hidden="true"></div>
+        </button>
+      </div>
+      <p class="stage-subhint">(या दो बार क्लिक / Enter दबाएं)</p>
+    </section>
+
+    <section class="stage-panel" id="stage-envelope" aria-label="Your Diwali Greeting Card" hidden>
+      <div class="hero-card-frame envelope-stage-card">
+        <div class="corner-ornament tl" aria-hidden="true"></div>
+        <div class="corner-ornament tr" aria-hidden="true"></div>
+        <div class="corner-ornament bl" aria-hidden="true"></div>
+        <div class="corner-ornament br" aria-hidden="true"></div>
+
+        <div class="mandala-emblem" aria-hidden="true">❁</div>
+        <p class="sender-tag">✨ <span id="card-from-tag">Someone Special</span> की तरफ से ✨</p>
+
+        <h2 class="recipient-heading">
+          <span id="card-to-name">Friend</span>, शुभ दीपावली
+        </h2>
+
+        <div class="envelope-wrapper" id="envelope-wrapper">
+          <button id="envelope-btn" class="envelope-box" type="button" aria-expanded="false" aria-label="Tap to open your secret Diwali letter">
+            <div class="envelope-flap"></div>
+            <div class="envelope-seal">🪔</div>
+          </button>
+
+          <div class="secret-letter" id="secret-letter" hidden>
+            <p class="letter-salutation" id="letter-salutation">Dear Friend,</p>
+            <p class="letter-body" id="letter-body">
+              Let every diya you light chase away one worry. May this year bring joy, peace, and full stomachs.
+            </p>
+            <p class="letter-signoff">— <span id="card-from-name">Someone Special</span></p>
+          </div>
+        </div>
+
+        <p class="envelope-hint" id="envelope-hint">Tap to open your secret letter</p>
+
+        <div class="share-action-row">
+          <button id="open-share-modal-btn" class="whatsapp-btn" type="button">
+            Share on WhatsApp 💬
+          </button>
+          <button id="quick-copy-btn" class="primary-btn compact-btn" type="button">
+            Copy Link 🔗
+          </button>
+        </div>
+
+        <div class="card-action-row">
+          <button id="replay-card-btn" class="secondary-btn" type="button">
+            Replay Reveal ↺
+          </button>
+          <button id="restart-story-btn" class="secondary-btn" type="button">
+            Start Over
+          </button>
+        </div>
+
+        <p id="share-toast" class="share-toast" role="status" aria-live="polite" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="share-modal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="corner-ornament tl" aria-hidden="true"></div>
+      <div class="corner-ornament tr" aria-hidden="true"></div>
+      <div class="corner-ornament bl" aria-hidden="true"></div>
+      <div class="corner-ornament br" aria-hidden="true"></div>
+
+      <h3 class="modal-title">✨ Send Diya Glow ✨</h3>
+      <p class="modal-desc">Enter your name so they know who sent this light:</p>
+
+      <form id="modal-share-form" class="modal-form">
+        <div class="form-group">
+          <input
+            type="text"
+            id="modal-sender-input"
+            class="festive-input"
+            placeholder="Your Name (e.g. Wastav)"
+            maxlength="30"
+            autocomplete="off"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <input
+            type="text"
+            id="modal-recipient-input"
+            class="festive-input"
+            placeholder="Friend's Name (e.g. Yuvraj)"
+            maxlength="30"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="modal-btn-row">
+          <button type="submit" id="modal-wa-send" class="whatsapp-btn full-btn">
+            Send on WhatsApp 💬
+          </button>
+          <button type="button" id="modal-copy-link" class="primary-btn compact-btn full-btn">
+            Copy Share Link 🔗
+          </button>
+        </div>
+        <button type="button" id="modal-close-btn" class="text-close-btn">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const DEFAULT_WISH = 'Let every diya you light chase away one worry. May this year bring joy, peace, and full stomachs.';
+
+      const state = {
+        isMuted: true,
+        audioCtx: null,
+        reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        hasSharedParams: false,
+        diyaLit: false,
+        rocketLaunched: false,
+        lastRocketTap: 0,
+        toName: 'Friend',
+        fromName: 'Wastav',
+        customWish: DEFAULT_WISH
+      };
+
+      function sanitizeInput(str, maxLength = 30) {
+        if (typeof str !== 'string') return '';
+        return str
+          .replace(/[\u0000-\u001F\u007F]/g, '')
+          .trim()
+          .slice(0, maxLength);
+      }
+
+      function buildShareableUrl(fromOverride, toOverride) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        const fName = fromOverride || state.fromName;
+        const tName = toOverride || state.toName;
+
+        if (tName && tName !== 'Friend') {
+          url.searchParams.set('to', tName);
+        }
+        if (fName && fName !== 'Someone Special') {
+          url.searchParams.set('from', fName);
+        }
+        if (state.customWish && state.customWish !== DEFAULT_WISH) {
+          url.searchParams.set('msg', state.customWish);
+        }
+        return url.toString();
+      }
+
+      function loadStateFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const toParam = sanitizeInput(params.get('to') || '', 30);
+        const fromParam = sanitizeInput(params.get('from') || '', 30);
+        const msgParam = sanitizeInput(params.get('msg') || '', 140);
+
+        if (toParam) {
+          state.toName = toParam;
+          state.hasSharedParams = true;
+        }
+        if (fromParam) {
+          state.fromName = fromParam;
+          state.hasSharedParams = true;
+        }
+        if (msgParam) {
+          state.customWish = msgParam;
+        }
+      }
+
+      function initAudioIfNeeded() {
+        if (!state.audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) state.audioCtx = new AudioContextClass();
+        }
+        if (state.audioCtx && state.audioCtx.state === 'suspended') {
+          state.audioCtx.resume();
+        }
+      }
+
+      function playTone(freqStart, freqEnd, duration = 0.5) {
+        if (state.isMuted || !state.audioCtx) return;
+        const now = state.audioCtx.currentTime;
+        const osc = state.audioCtx.createOscillator();
+        const gain = state.audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freqStart, now);
+        osc.frequency.exponentialRampToValueAtTime(freqEnd, now + duration);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(state.audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      function showStage(stageId, bodyStageName) {
+        const panels = document.querySelectorAll('.stage-panel');
+        panels.forEach((panel) => {
+          const isMatch = panel.id === stageId;
+          panel.hidden = !isMatch;
+          panel.classList.toggle('active', isMatch);
+        });
+        document.body.setAttribute('data-stage', bodyStageName);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const curtain = document.getElementById('curtain-overlay');
+        const audioBtn = document.getElementById('audio-toggle');
+        const previewCaption = document.getElementById('preview-caption');
+        const toDiyaBtn = document.getElementById('to-diya-btn');
+        const diyaBtn = document.getElementById('diya-btn');
+        const templeArch = document.getElementById('temple-arch');
+        const diyaPrompt = document.getElementById('diya-prompt');
+        const toRocketBtn = document.getElementById('to-rocket-btn');
+        const rocketBtn = document.getElementById('rocket-btn');
+        const rocketPrompt = document.getElementById('rocket-prompt');
+
+        const envelopeBtn = document.getElementById('envelope-btn');
+        const secretLetter = document.getElementById('secret-letter');
+        const envelopeHint = document.getElementById('envelope-hint');
+        const replayCardBtn = document.getElementById('replay-card-btn');
+        const restartStoryBtn = document.getElementById('restart-story-btn');
+        const shareToast = document.getElementById('share-toast');
+
+        const openShareModalBtn = document.getElementById('open-share-modal-btn');
+        const quickCopyBtn = document.getElementById('quick-copy-btn');
+        const shareModal = document.getElementById('share-modal');
+        const modalSenderInput = document.getElementById('modal-sender-input');
+        const modalRecipientInput = document.getElementById('modal-recipient-input');
+        const modalWaSend = document.getElementById('modal-wa-send');
+        const modalCopyLink = document.getElementById('modal-copy-link');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        function syncCardDom() {
+          document.getElementById('card-from-tag').textContent = state.fromName;
+          document.getElementById('card-to-name').textContent = state.toName;
+          document.getElementById('letter-salutation').textContent = `Dear ${state.toName},`;
+          document.getElementById('letter-body').textContent = state.customWish;
+          document.getElementById('card-from-name').textContent = state.fromName;
+        }
+
+        function showToast(message) {
+          shareToast.textContent = message;
+          shareToast.hidden = false;
+          setTimeout(() => {
+            shareToast.hidden = true;
+          }, 3200);
+        }
+
+        loadStateFromUrl();
+        syncCardDom();
+
+        if (state.hasSharedParams && previewCaption) {
+          previewCaption.textContent = `${state.toName}, आपके लिए ${state.fromName} का एक खास दिवाली संदेश है ✨`;
+        }
+
+        setTimeout(() => {
+          if (curtain) curtain.classList.add('open');
+        }, state.reducedMotion ? 50 : 650);
+
+        if (curtain) {
+          curtain.addEventListener('click', () => curtain.classList.add('open'));
+        }
+
+        audioBtn.addEventListener('click', () => {
+          state.isMuted = !state.isMuted;
+          audioBtn.setAttribute('aria-pressed', String(!state.isMuted));
+          if (!state.isMuted) {
+            initAudioIfNeeded();
+            audioBtn.textContent = '🔊 Sound On';
+            playTone(587.33, 880, 0.55);
+          } else {
+            audioBtn.textContent = '🔇 Sound Off';
+          }
+        });
+
+        toDiyaBtn.addEventListener('click', () => {
+          playTone(523.25, 659.25, 0.4);
+          showStage('stage-diya', 'diya');
+        });
+
+        diyaBtn.addEventListener('click', () => {
+          if (state.diyaLit) return;
+          state.diyaLit = true;
+          templeArch.classList.add('lit');
+          document.body.setAttribute('data-stage', 'diya-lit');
+          diyaPrompt.textContent = 'दीया जल उठा! ✨';
+          toRocketBtn.classList.add('visible');
+          playTone(659.25, 987.77, 0.7);
+        });
+
+        toRocketBtn.addEventListener('click', () => {
+          playTone(587.33, 783.99, 0.4);
+          showStage('stage-rocket', 'rocket');
+        });
+
+        function triggerRocketLaunch() {
+          if (state.rocketLaunched) return;
+          state.rocketLaunched = true;
+          rocketPrompt.textContent = 'Launching into the sky... 🎆';
+          rocketBtn.classList.add('launching');
+          playTone(220, 1174.66, 0.9);
+
+          setTimeout(() => {
+            showStage('stage-envelope', 'envelope');
+          }, state.reducedMotion ? 150 : 1050);
+        }
+
+        rocketBtn.addEventListener('click', (e) => {
+          const now = Date.now();
+          if (e.detail === 0 || now - state.lastRocketTap < 450) {
+            triggerRocketLaunch();
+          } else {
+            rocketPrompt.textContent = 'Tap once more to launch! 🚀';
+          }
+          state.lastRocketTap = now;
+        });
+
+        rocketBtn.addEventListener('dblclick', triggerRocketLaunch);
+
+        function openEnvelope() {
+          envelopeBtn.classList.add('opening');
+          envelopeBtn.setAttribute('aria-expanded', 'true');
+          playTone(523.25, 1046.5, 0.6);
+
+          setTimeout(() => {
+            envelopeBtn.hidden = true;
+            secretLetter.hidden = false;
+            envelopeHint.textContent = 'Your personalized Diwali message ✨';
+          }, state.reducedMotion ? 50 : 380);
+        }
+
+        function resetEnvelope() {
+          secretLetter.hidden = true;
+          envelopeBtn.hidden = false;
+          envelopeBtn.classList.remove('opening');
+          envelopeBtn.setAttribute('aria-expanded', 'false');
+          envelopeHint.textContent = 'Tap to open your secret letter';
+        }
+
+        envelopeBtn.addEventListener('click', openEnvelope);
+        replayCardBtn.addEventListener('click', resetEnvelope);
+
+        restartStoryBtn.addEventListener('click', () => {
+          state.diyaLit = false;
+          state.rocketLaunched = false;
+          templeArch.classList.remove('lit');
+          toRocketBtn.classList.remove('visible');
+          diyaPrompt.textContent = 'Tap the diya to light it';
+          rocketBtn.classList.remove('launching');
+          rocketPrompt.textContent = 'Double tap to light it';
+          resetEnvelope();
+          showStage('stage-hero', 'hero');
+        });
+
+        openShareModalBtn.addEventListener('click', () => {
+          modalSenderInput.value = state.fromName === 'Wastav' ? '' : state.fromName;
+          modalRecipientInput.value = state.toName === 'Friend' ? '' : state.toName;
+          shareModal.hidden = false;
+          modalSenderInput.focus();
+          playTone(523.25, 783.99, 0.3);
+        });
+
+        modalCloseBtn.addEventListener('click', () => {
+          shareModal.hidden = true;
+        });
+
+        function getModalNames() {
+          const sName = sanitizeInput(modalSenderInput.value, 30) || 'Wastav';
+          const rName = sanitizeInput(modalRecipientInput.value, 30) || 'Friend';
+          state.fromName = sName;
+          state.toName = rName;
+          syncCardDom();
+          return { sName, rName };
+        }
+
+        modalWaSend.addEventListener('click', (e) => {
+          e.preventDefault();
+          const { sName, rName } = getModalNames();
+          const shareUrl = buildShareableUrl(sName, rName);
+          const text = `🪔 *शुभ दीपावली, ${rName}!* ✨\n${sName} ने आपके लिए एक खास इंटरैक्टिव दिवाली सरप्राइज भेजा है।\n\nदीया जलाने और अपना सीक्रेट लेटर खोलने के लिए नीचे लिंक पर टैप करें:\n${shareUrl}`;
+          const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+          shareModal.hidden = true;
+          window.open(waUrl, '_blank', 'noopener,noreferrer');
+        });
+
+        modalCopyLink.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const { sName, rName } = getModalNames();
+          const shareUrl = buildShareableUrl(sName, rName);
+          shareModal.hidden = true;
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast('Link copied! Sender: ' + sName + ' 🔗✨');
+          } catch {
+            showToast('Link ready! Sender: ' + sName + ' 🔗✨');
+          }
+        });
+
+        quickCopyBtn.addEventListener('click', async () => {
+          const shareUrl = buildShareableUrl();
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast('Link copied to clipboard! 🔗✨');
+          } catch {
+            showToast('Link ready! 🔗✨');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
